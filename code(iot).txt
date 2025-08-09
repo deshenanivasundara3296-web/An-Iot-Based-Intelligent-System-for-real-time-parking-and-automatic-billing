@@ -1,0 +1,74 @@
+#include <LiquidCrystal.h>
+const int rs = 13, en = 12, d4 = 11, d5 = 10, d6 = 9, d7 = 8;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+int s1=2;
+int s2=3;
+float p1=0.00;
+float p2=0.00;
+int b1=A0;
+int b2=A1;
+void setup()
+{
+  pinMode(s1,INPUT);pinMode(s2,INPUT);pinMode(b1,INPUT_PULLUP);pinMode(b2,INPUT_PULLUP);
+  lcd.begin(16, 2);
+  lcd.clear();lcd.print("Parking Monitoring"); 
+  lcd.setCursor(0,1);lcd.print("and Billing System");delay(1000);
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  String iot="";delay(10);
+ int s1val=digitalRead(s1);delay(100);
+ int s2val=digitalRead(s2);delay(100);
+ int b1val=digitalRead(b1);delay(100);
+ int b2val=digitalRead(b2);delay(100); 
+ if(s1val==HIGH)
+ {
+ lcd.clear();lcd.print("1:FREE Rs:"); lcd.print(p1/10);lcd.print("/-"); 
+ iot=iot+" Slot:1 FREE";delay(10);
+ }
+ if(s2val==HIGH)
+ {
+ lcd.setCursor(0,1);lcd.print("2:FREE Rs:"); lcd.print(p2/10);lcd.print("/-"); 
+ iot=iot+" Slot:2 FREE";delay(10);
+ }
+ if(s1val==LOW) 
+ {
+  p1=p1+1;delay(1000);
+ lcd.clear();lcd.print("1:BUSY Rs:"); lcd.print(p1/10);lcd.print("/-"); 
+ iot=iot+" Slot:1 BUSY";delay(10); 
+ }
+ if(s2val==LOW)
+ {
+  p2=p2+1;delay(1000);
+ lcd.setCursor(0,1);lcd.print("2:BUSY Rs:"); lcd.print(p2/10);lcd.print("/-"); 
+ iot=iot+" Slot:2 BUSY";delay(10);
+ }
+ if(b1val==LOW)
+ {
+  if(p1>0)
+  {
+  lcd.clear();lcd.print("S1: BILL PAID..");delay(1000);p1=0;
+  lcd.setCursor(0,1);lcd.print("BILL SET TO 0");delay(1000);
+  }
+  else
+  {
+   lcd.clear();lcd.print("S1:BILL SET TO 0");delay(1000); 
+  }
+ }
+ if(b2val==LOW)
+ {
+  if(p2>0)
+  {
+  lcd.clear();lcd.print("S2: BILL PAID..");delay(1000);p2=0;
+  lcd.setCursor(0,1);lcd.print("BILL SET TO 0");delay(1000);
+  }
+  else
+  {
+   lcd.clear();lcd.print("S2:BILL SET TO 0");delay(1000); 
+  }
+ }
+delay(1000);
+Serial.println(iot);delay(10);
+}
